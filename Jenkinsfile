@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        sonarRunner 'sonar-scanner'
-    }
-
     stages {
 
         stage('Checkout Code') {
@@ -16,7 +12,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh 'sonar-scanner -Dsonar.projectKey=jenkins-demo -Dsonar.sources=.'
+                    sh '''
+                    /var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonar-scanner/bin/sonar-scanner \
+                    -Dsonar.projectKey=jenkins-demo \
+                    -Dsonar.sources=.
+                    '''
                 }
             }
         }
