@@ -1,37 +1,56 @@
 pipeline {
-    agent any
+agent any
 
-    stages {
+```
+stages {
 
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main', url: 'https://github.com/devishalops/jenkins-demo.git'
-            }
+    stage('Checkout Code') {
+        steps {
+            git branch: 'main', url: 'https://github.com/devishalops/jenkins-demo.git'
         }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh '''
-                    /var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/sonar-scanner/bin/sonar-scanner \
-                    -Dsonar.projectKey=jenkins-demo \
-                    -Dsonar.sources=.
-                    '''
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t jenkins-demo .'
-            }
-        }
-
-        stage('Run Container') {
-            steps {
-                sh 'docker run -d -p 8082:80 jenkins-demo'
-            }
-        }
-
     }
+
+    stage('SonarQube Analysis') {
+        steps {
+            withSonarQubeEnv('sonarqube') {
+                sh '''
+                sonar-scanner \
+                -Dsonar.projectKey=jenkins-demo \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=http://localhost:9000
+                '''
+            }
+        }
+    }
+
+    stage('Build Docker Image') {
+        steps {
+            sh 'docker build -t jenkins-demo .'
+        }
+    }
+
+    stage('Stop Old Container') {
+        steps {
+            sh 'docker rm -f jenkins-demo-container || true'
+        }
+    }
+
+    stage('Run Docker Container') {
+        steps {
+            sh 'docker run -d -p 8082:80 --name jenkins-demo-container jenkins-demo'
+        }
+    }
+
+}
+
+post {
+    success {
+        echo 'Pipeline executed successfully!'
+    }
+    failure {
+        echo 'Pipeline failed!'
+    }
+}
+```
+
 }
