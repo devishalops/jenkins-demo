@@ -3,21 +3,21 @@ pipeline {
 
     stages {
 
-        stage('Clone Repo') {
+        stage('Clone') {
             steps {
-                echo 'Cloning repository from GitHub'
+                echo 'Cloning repository'
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Build stage running'
+                sh 'docker build -t jenkins-demo .'
             }
         }
 
-        stage('Test') {
+        stage('Run Container') {
             steps {
-                echo 'Test stage running'
+                sh 'docker run -d -p 8081:80 jenkins-demo'
             }
         }
 
