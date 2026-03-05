@@ -1,11 +1,28 @@
 pipeline {
     agent any
 
+    tools {
+        sonarQubeScanner 'sonar-scanner'
+    }
+
     stages {
 
-        stage('Clone') {
+        stage('Checkout Code') {
             steps {
-                echo 'Cloning repository'
+                git 'https://github.com/devishalops/jenkins-demo.git'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=jenkins-demo \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://localhost:9000
+                    '''
+                }
             }
         }
 
@@ -17,7 +34,7 @@ pipeline {
 
         stage('Run Container') {
             steps {
-                sh 'docker run -d -p 8081:80 jenkins-demo'
+                sh 'docker run -d -p 8082:80 jenkins-demo'
             }
         }
 
