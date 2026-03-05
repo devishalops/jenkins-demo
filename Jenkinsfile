@@ -50,6 +50,5 @@ post {
         echo 'Pipeline failed!'
     }
 }
-```
 
 }
