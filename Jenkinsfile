@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        sonarQubeScanner 'sonar-scanner'
-    }
-
     stages {
 
         stage('Checkout Code') {
@@ -16,12 +12,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh '''
-                    sonar-scanner \
-                    -Dsonar.projectKey=jenkins-demo \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://localhost:9000
-                    '''
+                    sh 'sonar-scanner -Dsonar.projectKey=jenkins-demo -Dsonar.sources=.'
                 }
             }
         }
