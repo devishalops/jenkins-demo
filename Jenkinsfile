@@ -24,7 +24,21 @@ stages {
 
     stage('Build Docker Image') {
         steps {
-            sh 'docker build -t jenkins-demo .'
+            sh 'docker build -t devishalops/jenkins-demo .'
+        }
+    }
+
+    stage('Login to DockerHub') {
+        steps {
+            withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                sh 'echo $PASS | docker login -u $USER --password-stdin'
+            }
+        }
+    }
+
+    stage('Push Docker Image') {
+        steps {
+            sh 'docker push devishalops/jenkins-demo'
         }
     }
 
@@ -36,19 +50,10 @@ stages {
 
     stage('Run Container') {
         steps {
-            sh 'docker run -d -p 8082:80 --name jenkins-demo-container jenkins-demo'
+            sh 'docker run -d -p 8082:80 --name jenkins-demo-container devishalops/jenkins-demo'
         }
     }
 
-}
-
-post {
-    success {
-        echo 'Pipeline executed successfully!'
-    }
-    failure {
-        echo 'Pipeline failed!'
-    }
 }
 
 }
